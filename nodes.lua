@@ -1,3 +1,12 @@
+minetest.register_node("friandises:chocolat_sucre", {
+    description = "Chocolat recouvert de sucre",
+    tiles = {"friandises_chocolat.png^friandises_sucre_overlay.png"},
+    is_ground_content = false,
+    groups = {crumbly=2, oddly_breakable_by_hand=1},
+    drop = "friandises:chocolat",
+    sounds = default.node_sound_dirt_defaults(),
+})
+
 -- Chocolat
 minetest.register_node("friandises:chocolat", {
     description = "Chocolate Block",

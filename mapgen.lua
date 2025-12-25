@@ -1,19 +1,22 @@
-local c_air     = minetest.get_content_id("air")
-local c_stone   = minetest.get_content_id("default:stone")
+-- ===============================
+-- MAPGEN : Friandises Cave
+-- ===============================
 
-local c_choco   = minetest.get_content_id("friandises:chocolat")
-local c_guim    = minetest.get_content_id("friandises:guimauve")
-local c_caramel = minetest.get_content_id("friandises:caramel")
+local c_air           = minetest.get_content_id("air")
+local c_choco         = minetest.get_content_id("friandises:chocolat")
+local c_chocolat_sucre= minetest.get_content_id("friandises:chocolat_sucre")
+local c_guim          = minetest.get_content_id("friandises:guimauve")
+local c_caramel       = minetest.get_content_id("friandises:caramel")
 
 -- ===============================
 -- CONFIGURATION DES REALMS
 -- ===============================
-local REALM_SIZE = 512        -- taille d'une zone
-local REALM_CHANCE = 0.12     -- 12 % des zones deviennent Candy Cave
-local Y_MIN = -200
-local Y_MAX = -50
+local REALM_SIZE    = 512     -- taille d'une zone
+local REALM_CHANCE  = 0.12    -- 12 % de zones deviennent Candy Cave
+local Y_MIN         = -5000
+local Y_MAX         = -200
 
--- Bruit interne (forme des cavernes)
+-- Bruit interne pour forme des cavernes
 local noise_shape = minetest.get_perlin({
     offset = 0,
     scale = 1,
@@ -51,7 +54,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
         z = (minp.z + maxp.z) / 2,
     }
 
-    -- pas un Candy Realm → on ignore TOUT
+    -- pas un Candy Realm → on ignore tout
     if not is_candy_realm(center) then return end
 
     local vm, emin, emax = minetest.get_mapgen_object("voxelmanip")
@@ -62,28 +65,26 @@ minetest.register_on_generated(function(minp, maxp, seed)
     for y = math.max(minp.y, Y_MIN), math.min(maxp.y, Y_MAX) do
     for x = minp.x+1, maxp.x-1 do
         local vi = area:index(x,y,z)
+        local n = noise_shape:get_3d({x=x, y=y, z=z})
 
-        if data[vi] == c_stone then
-            local n = noise_shape:get_3d({x=x, y=y, z=z})
+        if n > 0.62 then
+            -- Creuse la cavité
+            data[vi] = c_air
 
-            if n > 0.62 then
-                data[vi] = c_air
-
-                -- Parois sucrées locales
-                for _,o in ipairs({
-                    {1,0,0},{-1,0,0},{0,1,0},{0,-1,0},{0,0,1},{0,0,-1}
-                }) do
-                    local ni = area:index(x+o[1], y+o[2], z+o[3])
-                    if data[ni] == c_stone then
-                        local r = math.random(10)
-                        if r <= 5 then
-                            data[ni] = c_choco
-                        elseif r <= 8 then
-                            data[ni] = c_guim
-                        else
-                            data[ni] = c_caramel
-                        end
-                    end
+            -- Blocs sucrés autour
+            for _,o in ipairs({
+                {1,0,0},{-1,0,0},{0,1,0},{0,-1,0},{0,0,1},{0,0,-1}
+            }) do
+                local ni = area:index(x+o[1], y+o[2], z+o[3])
+                local r = math.random(12)
+                if r <= 5 then
+                    data[ni] = c_choco
+                elseif r <= 8 then
+                    data[ni] = c_guim
+                elseif r <= 10 then
+                    data[ni] = c_caramel
+                else
+                    data[ni] = c_chocolat_sucre
                 end
             end
         end

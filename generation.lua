@@ -21,7 +21,7 @@ function friandises.place_chocolate_tablet(pos)
     for y = 0, 4 do
         for x = -1, 1 do
             local p = {x=pos.x+x, y=pos.y+y, z=pos.z}
-            minetest.set_node(p, {name="friandises:chocolat"})
+            minetest.set_node(p, {name="friandises:chocolat_block"})
         end
     end
 end
